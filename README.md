@@ -7,19 +7,25 @@
 To design and implement a LangChain Expression Language (LCEL) expression that utilizes at least two prompt parameters and three key components (prompt, model, and output parser), and to evaluate its functionality by analyzing relevant examples of its application in real-world scenarios.
 
 ### PROBLEM STATEMENT:
-We need to create a LangChain Expression Language (LCEL) expression that processes two input parameters, generates a response using a language model, and outputs a structured format based on a defined schema. The implementation should involve a prompt, model, and output parser to handle the input and generate a response effectively.
+Develop an LCEL system capable of generating summaries and extracting key points from input data, using prompt templates, language models, and output parsers for structured output.
 
 
 ### DESIGN STEPS:
 
 #### STEP 1:
-Define a prompt template that includes the input parameters (e.g., topic and context). The prompt should guide the model in generating a summary and key points from the provided context.
+Create a prompt template with placeholders for a topic and context.
 
 #### STEP 2:
-Initialize a language model (e.g., OpenAI’s text-davinci-003) that will generate the output based on the prompt template. Set a temperature parameter for controlling response creativity.
+Configure a language model with specified parameters for processing the template.
 
 #### STEP 3:
-Define the output structure by creating a response schema with multiple fields (e.g., summary and key_points). Use the structured output parser to extract the relevant information from the model's response.
+Define response schemas for structuring the output into a summary and key points.
+
+#### STEP 4:
+Implement a function to generate, process, and parse the response using the template, model, and output parser.
+
+#### STEP 5:
+Demonstrate functionality using a practical example.
 
 ### PROGRAM:
 ```py
@@ -27,35 +33,48 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 
-prompt = PromptTemplate(
-    input_variables=["topic", "context"],
-    template="Write a summary about {topic} based on the following context: {context}"
+template = PromptTemplate(
+    input_variables=["subject", "details"],
+    template="Provide a summary for {subject} using this context: {details}"
 )
 
-llm = OpenAI(model="text-davinci-003", temperature=0.7)
+model = OpenAI(model="text-davinci-003", temperature=0.7)
 
-response_schemas = [
-    ResponseSchema(name="summary", description="A concise summary of the topic"),
-    ResponseSchema(name="key_points", description="Main points covered in the summary")
+schemas = [
+    ResponseSchema(name="summary", description="A brief overview of the subject"),
+    ResponseSchema(name="highlights", description="Key points of the summary")
 ]
 
-output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+parser = StructuredOutputParser.from_response_schemas(schemas)
 
-def evaluate_expression(topic, context):
-    formatted_prompt = prompt.format(topic=topic, context=context)
-    raw_output = llm(formatted_prompt)
-    parsed_output = output_parser.parse(raw_output)
-    return parsed_output
+def process_expression(subject, details):
+    generated_prompt = template.format(subject=subject, details=details)
+    model_response = model(generated_prompt)
+    structured_response = parser.parse(model_response)
+    return structured_response
 
-if __name__ == "__main__":
-    topic = "Artificial Intelligence"
-    context = "Artificial Intelligence is a field of study focusing on creating machines capable of mimicking human intelligence. It includes machine learning, robotics, and natural language processing."
-    result = evaluate_expression(topic, context)
-    print("LCEL Expression Output:")
-    print(result)
+topic_input = "Climate Change"
+context_input = (
+    "Climate change refers to long-term shifts in temperatures and weather patterns, mainly caused by human activities such as burning fossil fuels, deforestation, and industrial processes. "
+    "It has led to global warming, rising sea levels, and increased frequency of extreme weather events."
+)
+
+output_result = process_expression(topic_input, context_input)
+
+def display_result(data):
+    print("Generated LCEL Expression Output:")
+    print("\nSummary:")
+    print(data.get("summary", "Summary not provided."))
+    print("\nHighlights:")
+    print(data.get("highlights", "Highlights not provided."))
+
+display_result(output_result)
+
 ```
 
 ### OUTPUT:
+![image](https://github.com/user-attachments/assets/f7a0c472-e642-4ce8-9669-10c24fb0671a)
+
 
 ### RESULT:
 The system successfully processes the input parameters, generates a summary, and extracts key points from the context provided. This demonstrates the functionality of LangChain Expression Language (LCEL) expressions, utilizing a prompt, language model, and output parser to produce structured responses.
